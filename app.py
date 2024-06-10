@@ -5,7 +5,7 @@ import random
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-# Configure Flask-Mail
+# Configure Flask-Mailb
 app.config['MAIL_SERVER'] = 'smtp.example.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USERNAME'] = 'your_email@example.com'
