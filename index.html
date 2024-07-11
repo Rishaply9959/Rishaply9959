@@ -3,32 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Clone</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Number Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 2em;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .converter {
+            margin-top: 2em;
+        }
+
+        input {
+            padding: 0.5em;
+            margin: 0.5em 0;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 0.5em 1em;
+            border: none;
+            border-radius: 4px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        p {
+            font-weight: bold;
+            margin-top: 1em;
+        }
+
+        a {
+            display: block;
+            margin-top: 1em;
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        #process-details {
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <div class="logo">YouTube Clone</div>
-        <div class="search-bar">
-            <input type="text" placeholder="Search" id="search-input">
-            <button id="search-button">Search</button>
+    <div id="main-page" class="container">
+        <h1>Number Converter</h1>
+
+        <div class="converter">
+            <h2>Decimal to Binary</h2>
+            <input type="number" id="decimal-input" placeholder="Enter decimal number">
+            <button onclick="convertToBinary()">Convert to Binary</button>
+            <p id="binary-output"></p>
+            <a id="binary-process-link" href="#" onclick="showProcess('binary')">See Conversion Process</a>
         </div>
-        <div class="user-profile">
-            <img src="user-placeholder.png" alt="User Profile">
+
+        <div class="converter">
+            <h2>Binary to Decimal</h2>
+            <input type="text" id="binary-input" placeholder="Enter binary number">
+            <button onclick="convertToDecimal()">Convert to Decimal</button>
+            <p id="decimal-output"></p>
+            <a id="decimal-process-link" href="#" onclick="showProcess('decimal')">See Conversion Process</a>
         </div>
-    </header>
-    <main>
-        <div class="video-player">
-            <video id="main-video" controls>
-                <source src="sample-video.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-        <div class="video-list" id="video-list">
-            <!-- Thumbnails of videos will go here -->
-        </div>
-    </main>
-    <script src="scripts.js"></script>
+    </div>
+
+    <div id="process-page" class="container" style="display:none;">
+        <h1>Conversion Process</h1>
+        <p id="process-details"></p>
+        <button onclick="goBack()">Go Back</button>
+    </div>
+
+    <script>
+        function convertToBinary() {
+            let decimal = document.getElementById('decimal-input').value;
+            let binary = parseInt(decimal, 10).toString(2);
+            document.getElementById('binary-output').innerText = `Binary: ${binary}`;
+            generateBinaryProcess(decimal, binary);
+        }
+
+        function convertToDecimal() {
+            let binary = document.getElementById('binary-input').value;
+            let decimal = parseInt(binary, 2);
+            document.getElementById('decimal-output').innerText = `Decimal: ${decimal}`;
+            generateDecimalProcess(binary, decimal);
+        }
+
+        function generateBinaryProcess(decimal, binary) {
+            let process = `Conversion of Decimal ${decimal} to Binary:\n`;
+            let num = parseInt(decimal, 10);
+            let steps = [];
+            while (num > 0) {
+                steps.push(`${num} ÷ 2 = ${Math.floor(num / 2)} with a remainder of ${num % 2}`);
+                num = Math.floor(num / 2);
+            }
+            process += steps.reverse().join('\n');
+            sessionStorage.setItem('binaryProcess', process);
+        }
+
+        function generateDecimalProcess(binary, decimal) {
+            let process = `Conversion of Binary ${binary} to Decimal:\n`;
+            let steps = binary.split('').reverse().map((bit, index) => `${bit} × 2^${index} = ${bit * Math.pow(2, index)}`);
+            process += steps.join('\n');
+            sessionStorage.setItem('decimalProcess', process);
+        }
+
+        function showProcess(type) {
+            let processDetails = document.getElementById('process-details');
+            if (type === 'binary') {
+                processDetails.innerText = sessionStorage.getItem('binaryProcess');
+            } else {
+                processDetails.innerText = sessionStorage.getItem('decimalProcess');
+            }
+            document.getElementById('main-page').style.display = 'none';
+            document.getElementById('process-page').style.display = 'block';
+        }
+
+        function goBack() {
+            document.getElementById('main-page').style.display = 'block';
+            document.getElementById('process-page').style.display = 'none';
+        }
+    </script>
 </body>
-  </html>
-  
+</html>
